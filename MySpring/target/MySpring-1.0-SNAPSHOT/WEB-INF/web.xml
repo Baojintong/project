@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.4"
+         xmlns="http://java.sun.com/xml/ns/j2ee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+
+  <servlet>
+    <description>我的核心Servlet</description>
+    <servlet-name>jtmvc</servlet-name>
+    <servlet-class>cn.jt.mvcframework.servlet.JTDispatcherServlet</servlet-class>
+    <init-param>
+      <param-name>contextConfigLocation</param-name>
+      <param-value>jtApplication.properties</param-value>
+    </init-param>
+    <load-on-startup>1</load-on-startup><!--加载启动顺序-->
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>jtmvc</servlet-name>
+    <!--拦截所有请求-->
+    <url-pattern>/*</url-pattern>
+  </servlet-mapping>
+
+</web-app>
