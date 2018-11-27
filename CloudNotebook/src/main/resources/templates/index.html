@@ -1,127 +1,52 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <title>NoteBook</title>
-    <link rel="stylesheet" href="/layui/css/layui.css">
-    <link rel="stylesheet" href="/my/css/my.css">
-    <link rel="stylesheet" href="/my/css/style.css">
-    <link rel="stylesheet" href="/css/editormd.css"/>
-    <link rel="shortcut icon" href="https://pandao.github.io/editor.md/favicon.ico" type="image/x-icon"/>
+    <title>layui</title>
+    <link rel="stylesheet" href="/layui/css/layui.css" media="all">
+    <script src="/layui/layui.js" charset="utf-8"></script>
 </head>
-<body class="layui-layout-body">
-<div class="layui-layout layui-layout-admin">
-    <div class="layui-header my-head">
-        <div class="my-layui-logo">NoteBook</div>
-    </div>
-
-    <div class="layui-side layui-bg-black">
-        <div class="layui-side-scroll">
-            <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
-            <ul class="layui-nav layui-nav-tree" lay-filter="test">
-                <li class="layui-nav-item layui-nav-itemed">
-                    <a class="" onclick="save()">Save</a>
-                </li>
-                <li class="layui-nav-item layui-nav-itemed">
-                    <a class="" href="javascript:;">New</a>
-                </li>
-                <li class="layui-nav-item layui-nav-itemed">
-                    <a class="" onclick="read()">Read</a>
-                    <dl class="layui-nav-child" id="readList">
-                    </dl>
-                </li>
-            </ul>
+<body>
+<ul class="layui-nav layui-bg-blue">
+    <li class="layui-nav-item layui-this"><a href="">我的笔记</a></li>
+    <li class="layui-nav-item"><a href="">新增笔记</a></li>
+</ul>
+<div style="padding: 20px; background-color: #F2F2F2;">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md6" th:each="note:${noteList}" th:onclick="'javascript:read(\''+${note.title}+'\')' ">
+            <div class="layui-card">
+                <div class="layui-card-header layui-bg-blue" th:text="${note.title}">卡片面板</div>
+                <div class="layui-card-body">
+                    摘要
+                </div>
+            </div>
         </div>
-    </div>
-    <!-- 内容主体区域 -->
-    <div class="layui-body">
-        <div id="test-editormd">
-            <textarea id="noteText" style="display:none;"></textarea>
-        </div>
-    </div>
-    <div class="layui-footer">
-        <!-- 底部固定区域 -->
-        baojintong1994@gmail.com
     </div>
 </div>
-<!--注意js包加载顺序问题-->
 <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
 <script src="/layui/layui.all.js"></script>
-<script src="/editormd.js"></script>
 <script>
     var path = "http://127.0.0.1:8888"
     layui.use('element', function () {
-        var element = layui.element;
-
-    });
-    var testEditor;
-    $(function () {
-        testEditor = editormd("test-editormd", {
-            width: "100%",
-            height: "100%",
-            syncScrolling: "single",
-            path: "../lib/",
-            theme: "dark",
-            previewTheme: "dark",
-            editorTheme: "pastel-on-dark"
+        var element = layui.element; //导航的hover效果、二级菜单等功能，需要依赖element模块
+        //监听导航点击
+        element.on('nav(demo)', function (elem) {
+            //console.log(elem)
+            layer.msg(elem.text());
         });
-        $.ajax({
-            url: path + "/operation/readList",
-            type: "POST",
-            async: false,
-            data: {
-            },
-            dataType: "json",
-            success: function (data) {
-                for(var i=0;i<data.length;i++){
-                    $("#readList").append("<dd><a onclick='inputTest(\""+data[i]+"\")'>"+data[i]+"</a></dd>");
-                }
-            },
-            error: function (xhr, textStatus) {
-                console.log('错误');
-                console.log(xhr);
-                console.log(textStatus);
-            }
-        })
     });
-
-    function save() {
-        var noteText = $("#noteText").text();
-        console.log(noteText);
-        $.ajax({
-            url: path + "/operation/save",
-            type: "POST",
-            async: false,
-            data: {
-                text: noteText,
-            },
-            dataType: "json",
-            success: function (data) {
-
-            },
-            error: function (xhr, textStatus) {
-                console.log('错误');
-                console.log(xhr);
-                console.log(textStatus);
-            }
-        })
-    }
-    
-    function inputTest(noteName) {
-        console.log(noteName);
-        console.log($("#noteText").text());
-        $("#noteText").val("232323");
+    function read(name) {
+        console.log(name)
         $.ajax({
             url: path + "/operation/read",
             type: "POST",
             async: false,
             data: {
-                name: noteName,
+                name: name,
             },
             success: function (data) {
-                $("#noteText").val(data);
-                //console.log(data)
+                //$("#noteText").val(data);
+                console.log(232323)
             },
             error: function (xhr, textStatus) {
                 console.log('错误');
@@ -130,7 +55,6 @@
             }
         })
     }
-
 </script>
 </body>
 </html>

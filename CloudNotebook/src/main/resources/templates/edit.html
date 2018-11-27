@@ -1,33 +1,122 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="utf-8"/>
-    <title>Simple example - Editor.md examples</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>个人笔记</title>
+    <link rel="stylesheet" href="/layui/css/layui.css">
+    <link rel="stylesheet" href="/my/css/my.css">
     <link rel="stylesheet" href="/my/css/style.css">
     <link rel="stylesheet" href="/css/editormd.css"/>
     <link rel="shortcut icon" href="https://pandao.github.io/editor.md/favicon.ico" type="image/x-icon"/>
 </head>
-<body>
-<div id="layout">
-    <header>
-        <h1>Simple example</h1>
-    </header>
-    <div id="test-editormd">
-        <textarea style="display:none;"></textarea>
+<body class="layui-layout-body">
+<div class="layui-layout layui-layout-admin">
+    <div class="layui-header my-head">
+        <div class="my-layui-logo">个人笔记</div>
+    </div>
+
+    <div class="layui-side layui-bg-black">
+        <div class="layui-side-scroll">
+            <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+            <ul class="layui-nav layui-nav-tree" lay-filter="test">
+                <li class="layui-nav-item layui-nav-itemed">
+                    <a class="" onclick="save()">保存笔记</a>
+                </li>
+                <li class="layui-nav-item layui-nav-itemed">
+                    <a class="" href="javascript:;">新增笔记</a>
+                </li>
+                <li class="layui-nav-item layui-nav-itemed">
+                    <a class="">笔记列表</a>
+                    <dl class="layui-nav-child" id="readList">
+                        <dd th:each="note:${noteList}">
+                            <a th:href="@{/operation/read(name=${note})}" th:text="${note}"></a>
+                        </dd>
+                    </dl>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <!-- 内容主体区域 -->
+    <div class="layui-body">
+        <div id="test-editormd">
+            <textarea id="noteText" style="display:none;" th:if="${context != null}" th:text="${context.context}"></textarea>
+        </div>
+    </div>
+    <div class="layui-footer">
+        <!-- 底部固定区域 -->
+        baojintong1994@gmail.com
     </div>
 </div>
+<!--注意js包加载顺序问题-->
 <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+<script src="/layui/layui.all.js"></script>
 <script src="/editormd.js"></script>
-<script type="text/javascript">
+<script>
+    var path = "http://127.0.0.1:8888"
+    layui.use('element', function () {
+        var element = layui.element;
+
+    });
     var testEditor;
     $(function () {
         testEditor = editormd("test-editormd", {
-            width: "90%",
-            height: 640,
+            width: "100%",
+            height: "100%",
             syncScrolling: "single",
-            path: "../lib/"
+            path: "../lib/",
+            theme: "dark",
+            previewTheme: "dark",
+            editorTheme: "pastel-on-dark",
+            onchange:function () {
+                console.log(this)
+            }
         });
     });
+
+    function save() {
+        var noteText = $("#noteText").text();
+        console.log(noteText);
+        $.ajax({
+            url: path + "/operation/save",
+            type: "POST",
+            async: false,
+            data: {
+                text: noteText,
+            },
+            dataType: "json",
+            success: function (data) {
+
+            },
+            error: function (xhr, textStatus) {
+                console.log('错误');
+                console.log(xhr);
+                console.log(textStatus);
+            }
+        })
+    }
+    
+    function inputTest(noteName) {
+        console.log(noteName);
+        $.ajax({
+            url: path + "/operation/read",
+            type: "POST",
+            async: true,
+            data: {
+                name: noteName,
+            },
+            success: function (data) {
+                //$("#noteText").val(data);
+                console.log(232323)
+            },
+            error: function (xhr, textStatus) {
+                console.log('错误');
+                console.log(xhr);
+                console.log(textStatus);
+            }
+        })
+    }
+
 </script>
 </body>
 </html>

@@ -1,14 +1,22 @@
 package com.notebook.cloud.controller;
 
+import com.google.gson.Gson;
+import com.notebook.cloud.bean.NoteContextBean;
 import com.notebook.cloud.lock.DistributedLock;
+import com.notebook.cloud.util.PropertyReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
-@RestController
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
+@Controller
 public class IndexController {
 
     int n=500;
@@ -31,10 +39,12 @@ public class IndexController {
     }
 
     @RequestMapping("/index")
-    public String index() throws Exception {
-        System.out.println("index");
+    public String index(Model model) throws Exception {
+        System.out.println(PropertyReader.getProperty("project.path"));
+        getNoteList(model);
         return "/index";
     }
+
     @RequestMapping("/edit")
     public String edit() throws Exception {
         System.out.println("edit");
@@ -48,5 +58,20 @@ public class IndexController {
         Thread.sleep(1000);
         System.out.println(--n);
         //lock.releaseLock("resource", indentifier);
+    }
+
+    public static void getNoteList(Model model){
+        File file=new File("note");
+        List<NoteContextBean> beans=new ArrayList<>();
+        if(file.isDirectory()) {
+            String[] files=file.list();
+            NoteContextBean bean=null;
+            for(String s:files){
+                bean=new NoteContextBean();
+                bean.setTitle(s.replaceAll("\\.md",""));
+                beans.add(bean);
+            }
+        }
+        model.addAttribute("noteList",beans);
     }
 }
